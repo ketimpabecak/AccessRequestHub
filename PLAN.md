@@ -6,7 +6,7 @@ Membangun MVP "Access Request Hub" sebagai single source of truth untuk perminta
 ## 2. Architecture & Data Model
 - **Backend**: .NET 8 Web API dengan Controller-based architecture.
 - **Database**: SQL Server (LocalDB) menggunakan Entity Framework Core Code-First.
-- **Frontend**: (Akan diimplementasikan di Phase berikutnya, kemungkinan React/TypeScript atau Blazor).
+- **Frontend**: (Akan diimplementasikan di Phase berikutnya, kemungkinan Blazor).
 - **Data Model**: 
   - `User`: Menyimpan role dan self-referencing ManagerId.
   - `Application`: Terkait dengan SystemOwner.
@@ -14,12 +14,12 @@ Membangun MVP "Access Request Hub" sebagai single source of truth untuk perminta
   - `AuditEvent`: Append-only log untuk setiap transisi state.
 
 ## 3. Implementation Order
-1. ?Setup Project, Git, dan EF Core Schema (Phase 1).
-2. ? Backend Business Logic: Services untuk Idempotency, State Machine, dan Concurrency (Phase 2).
-3. ? API Endpoints & Server-side Authorization (Phase 2).
-4. ? Frontend Implementation (User switcher, Forms, Inbox).
-5. ? Automated Testing (xUnit).
-6. ? Documentation (AI_USAGE.md, REVIEW.md, INTEGRITY.md, README.md).
+1. Setup Project, Git, dan EF Core Schema (Phase 1).
+2. Backend Business Logic: Services untuk Idempotency, State Machine, dan Concurrency (Phase 2).
+3. API Endpoints & Server-side Authorization (Phase 2).
+4. Frontend Implementation (User switcher, Forms, Inbox).
+5. Automated Testing (xUnit).
+6. Documentation (AI_USAGE.md, REVIEW.md, INTEGRITY.md, README.md).
 
 ## 4. Test Strategy
 - Unit tests untuk business logic (state transitions, high-risk detection).

@@ -1,0 +1,117 @@
+﻿@page "/create-request"
+@rendermode InteractiveServer
+@inject HttpClient Http
+@inject UserState UserState
+@inject NavigationManager Navigation
+
+<PageTitle>Create Access Request</PageTitle>
+
+<h3>Create New Access Request</h3>
+<p class="text-muted">Logged in as: <strong>@UserState.CurrentUserName</strong></p>
+
+@if (isLoading)
+{
+    <div class="alert alert-info">Submitting...</div>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success">@successMessage. <a href="/my-requests">View My Requests</a></div>
+}
+
+<div class="card p-4">
+    <div class="mb-3">
+        <label class="form-label">Application</label>
+        <select class="form-select" @bind="request.ApplicationId">
+            <option value="AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA">CRM</option>
+            <option value="BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB">Finance Portal</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Environment</label>
+        <select class="form-select" @bind="request.Environment">
+            <option value="0">Non-Production</option>
+            <option value="1">Production (High Risk)</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Access Level</label>
+        <select class="form-select" @bind="request.AccessLevel">
+            <option value="0">Read</option>
+            <option value="1">Admin (High Risk)</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Justification</label>
+        <textarea class="form-control" @bind="request.Justification" rows="3"></textarea>
+    </div>
+
+    <button class="btn btn-primary" @onclick="SubmitRequest" disabled="@isLoading">
+        @(isLoading ? "Submitting..." : "Submit Request")
+    </button>
+
+</div>
+
+@code {
+
+    private bool isLoading = false;
+    private string errorMessage = "";
+    private string successMessage = "";
+
+    private CreateRequestDto request = new();
+
+    private async Task SubmitRequest()
+    {
+        isLoading = true;
+        errorMessage = "";
+        successMessage = "";
+        StateHasChanged();
+
+        try
+        {
+            request.ClientRequestId = Guid.NewGuid().ToString();
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "api/AccessRequests");
+            httpRequest.Headers.Add("X-Current-User-Id", UserState.CurrentUserId);
+            httpRequest.Content = JsonContent.Create(request);
+
+            var response = await Http.SendAsync(httpRequest);
+
+            if (response.IsSuccessStatusCode)
+            {
+                successMessage = "Request created successfully!";
+                request = new CreateRequestDto();
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                errorMessage = $"Error {(int)response.StatusCode}: {errorContent}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Network/Server error: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    // DTO Sederhana untuk Form
+    public class CreateRequestDto
+    {
+        public string ClientRequestId { get; set; } = "";
+        public string ApplicationId { get; set; } = "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA";
+        public int Environment { get; set; } = 0;
+        public int AccessLevel { get; set; } = 0;
+        public string Justification { get; set; } = "";
+    }
+}

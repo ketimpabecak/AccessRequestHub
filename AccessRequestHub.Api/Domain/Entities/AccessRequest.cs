@@ -23,8 +23,8 @@ public class AccessRequest
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    [Timestamp]
-    public byte[] RowVersion { get; set; } = null!;
+    [ConcurrencyCheck]
+    public byte[] RowVersion { get; set; } = new byte[] { 0, 0, 0, 0, 0, 0, 0, 1 };
 
     public ICollection<AuditEvent> AuditEvents { get; set; } = new List<AuditEvent>();
 }

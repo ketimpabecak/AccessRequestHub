@@ -1,0 +1,27 @@
+﻿@inject UserState UserState
+@inject NavigationManager Navigation
+
+<div class="d-flex align-items-center gap-2">
+    <span class="fw-bold">Simulated User:</span>
+    <span class="badge bg-primary fs-6">@UserState.CurrentUserName</span>
+
+    <label for="userSelect" class="ms-3 mb-0">Switch to:</label>
+    <select id="userSelect" class="form-select form-select-sm" style="width: 200px;" @onchange="SwitchUser">
+        @foreach (var user in UserState.Users)
+        {
+            <option value="@user.Key" selected="@(user.Key == UserState.CurrentUserId)">@user.Value</option>
+        }
+    </select>
+</div>
+
+@code {
+    private async Task SwitchUser(ChangeEventArgs e)
+    {
+        var userId = e.Value?.ToString();
+        if (!string.IsNullOrEmpty(userId))
+        {
+            await UserState.SetUserAsync(userId);
+            Navigation.NavigateTo("/", forceLoad: true);
+        }
+    }
+}
